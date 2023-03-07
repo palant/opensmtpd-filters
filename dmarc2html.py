@@ -21,16 +21,23 @@ class Flags(enum.Flag):
     TIME = enum.auto()
 
 
-def extract_data(path):
-    ext = os.path.splitext(path)[1]
+def extract_data(file):
+    if isinstance(file, str):
+        ext = os.path.splitext(file)[1]
+    else:
+        ext = os.path.splitext(file.name)[1]
+
     if ext == '.xml':
-        with open(path, 'rb') as input:
-            return minidom.parse(input)
+        if isinstance(file, str):
+            with open(file, 'rb') as input:
+                return minidom.parse(input)
+        else:
+            return minidom.parse(file)
     if ext == '.gz':
-        with gzip.open(path, 'rb') as input:
+        with gzip.open(file, 'rb') as input:
             return minidom.parse(input)
     elif ext == '.zip':
-        with zipfile.ZipFile(path, 'r') as zip:
+        with zipfile.ZipFile(file, 'r') as zip:
             names = zip.namelist()
             if len(names) != 1:
                 raise Exception('Expected one zip file entry, got {}'.format(len(names)))
