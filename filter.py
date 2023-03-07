@@ -1,16 +1,36 @@
 #!/usr/bin/env python3
+import argparse
 import email
 import email.message
 import email.policy
 import io
+import re
 import traceback
 
 from dmarc2html import process_report
 from opensmtpd import FilterServer
 
-def convert(lines):
+def start():
+    parser = argparse.ArgumentParser(description='DMARC converter filter for OpenSMTPD.')
+    parser.add_argument('name', help='Name of the account receiving DMARC aggregate reports')
+    args = parser.parse_args()
+
+    server = FilterServer()
+    server.register_message_filter(lambda lines: convert(args.name, lines))
+    server.serve_forever()
+
+
+def convert(account_name, lines):
     try:
         parsed = email.message_from_string('\n'.join(lines), policy=email.policy.default)
+        recipient = parsed.get('to', '')
+        match = re.search(r'<([^<>]+)>', recipient)
+        if match:
+            recipient = match.group(1)
+        recipient = re.sub(r'@.*', '', recipient)
+        if recipient != account_name:
+            return lines
+
         if not parsed.is_multipart() and parsed.get_filename() is not None:
             parsed.make_mixed()
         if not parsed.is_multipart():
@@ -39,6 +59,4 @@ def convert(lines):
         return lines
 
 if __name__ == '__main__':
-    server = FilterServer()
-    server.register_message_filter(convert)
-    server.serve_forever()
+    start()
