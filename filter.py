@@ -16,7 +16,7 @@ def start():
     args = parser.parse_args()
 
     server = FilterServer()
-    server.register_message_filter(lambda lines: convert(args.name, lines))
+    server.register_message_filter(lambda _, lines: convert(args.name, lines))
     server.serve_forever()
 
 
