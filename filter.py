@@ -16,21 +16,24 @@ def start():
     args = parser.parse_args()
 
     server = FilterServer()
-    server.register_message_filter(lambda _, lines: convert(args.name, lines))
+    server.register_handler('report', 'tx-rcpt', save_rcpt)
+    server.register_message_filter(lambda session, lines: convert(args.name, session, lines))
     server.serve_forever()
 
 
-def convert(account_name, lines):
+def save_rcpt(session, _, result, address):
+    if result != 'ok':
+        return
+    session['rcpt'] = address
+
+
+def convert(account_name, session, lines):
     try:
-        parsed = email.message_from_string('\n'.join(lines), policy=email.policy.default)
-        recipient = parsed.get('to', '')
-        match = re.search(r'<([^<>]+)>', recipient)
-        if match:
-            recipient = match.group(1)
-        recipient = re.sub(r'@.*', '', recipient)
+        recipient = re.sub(r'@.*', '', session['rcpt'])
         if recipient != account_name:
             return lines
 
+        parsed = email.message_from_string('\n'.join(lines), policy=email.policy.default)
         if not parsed.is_multipart() and parsed.get_filename() is not None:
             parsed.make_mixed()
         if not parsed.is_multipart():
