@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>DMARC aggregate report from {{ report_metadata.org_name }}</title>
+</head>
+<body color="#000000" background="#FFFFFF">
+  <p>
+    DMARC aggregate report from <span title="{{ report_metadata.email }} {{ report_metadata.extra_contact_info }}">{{ report_metadata.org_name }}</span>
+    covering the time span from {{ report_metadata.date_range.begin }} to {{ report_metadata.date_range.end }}:
+  </p>
+  <table border="1" width="100%">
+    <tr>
+      <th>Source IP</th>
+      <th>Count</th>
+      <th>Disposition</th>
+      <th>DKIM</th>
+      <th>SPF</th>
+    </tr>
+    {% for r in record %}
+    <tr>
+      <td>{{ r.row.source_ip }}</td>
+      <td>{{ r.row.count }}</td>
+      <td bgcolor="{{ {'none': '#C0FFC0', 'quarantine': '#FFC0A0'}.get(r.row.policy_evaluated.disposition, '#FFC0C0') }}"{% if r.row.policy_evaluated.reason %} title="
+        {%- for reason in r.row.policy_evaluated.reason %}{{ reason.type }}{% if reason.comment %}: {{ reason.comment}}{% endif %}&#13;{% endfor -%}
+      "{% endif %}>
+        {{- r.row.policy_evaluated.disposition -}}
+        {%- if r.row.policy_evaluated.reason %} <span style="color: #E00000">&#x1F441;</span>{% endif -%}
+      </td>
+      <td bgcolor="{{ {'pass': '#C0FFC0'}.get(r.row.policy_evaluated.dkim, '#FFC0C0') }}"{% if r.auth_results.dkim %} title="
+        {%- for dkim in r.auth_results.dkim %}{{ dkim.domain }} {% if dkim.selector %}({{ dkim.selector }}) {% endif %} {{- dkim.result }}&#13;{% endfor -%}
+      "{% endif %}>
+        {{- r.row.policy_evaluated.dkim -}}
+        {%- if r.auth_results.dkim %} <span style="color: #E00000">&#x1F441;</span>{% endif -%}
+      </td>
+      <td bgcolor="{{ {'pass': '#C0FFC0'}.get(r.row.policy_evaluated.spf, '#FFC0C0') }}"{% if r.auth_results.spf %} title="
+        {%- for spf in r.auth_results.spf %}{{ spf.domain }} {% if spf.scope %}({{ spf.scope }}) {% endif %} {{- spf.result }}&#13;{% endfor -%}
+      "{% endif %}>
+        {{- r.row.policy_evaluated.spf -}}
+        {%- if r.auth_results.spf %} <span style="color: #E00000">&#x1F441;</span>{% endif -%}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  <!-- {{ xml }} -->
+</body>
+</html>

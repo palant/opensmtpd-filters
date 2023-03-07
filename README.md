@@ -1,2 +1,1 @@
-# dmarc2html
-Converter for DMARC aggregate reports into human-readable HTML
+This is a set of scripts to simplify handling DMARC aggregate reports for low-volume email servers.
