@@ -1,4 +1,4 @@
-This is a set of scripts to simplify handling DMARC aggregate reports for low-volume email servers. No support provided, use at your own risk.
+This is a set of scripts to simplify handling DMARC aggregate reports for low-volume email servers. Some explanations can be found in [this blog article](https://palant.info/2023/03/08/converting-incoming-emails-on-the-fly-with-opensmtpd-filters/). No support is provided, use at your own risk.
 
 Requirements: [Jinja2](https://jinja.palletsprojects.com/intro/#installation)
 
