@@ -154,14 +154,26 @@ class FilterServer:
         filtered list of lines. Note: this will call track_context().
         """
 
+        def escape_line(line):
+            if line.startswith('.'):
+                return '.' + line
+            else:
+                return line
+
+        def unescape_line(line):
+            if line.startswith('..'):
+                return line[1:]
+            else:
+                return line
+
         def handle_dataline(context, line, send_dataline):
             try:
                 if line != '.':
-                    context.setdefault('message_lines', []).append(line)
+                    context.setdefault('message_lines', []).append(unescape_line(line))
                 else:
                     lines = handler(context, context.get('message_lines', []))
                     for l in lines:
-                        send_dataline(l)
+                        send_dataline(escape_line(l))
                     send_dataline('.')
                     context.pop('message_lines', None)
             except:
