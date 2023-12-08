@@ -19,9 +19,13 @@ classifiers = [
 ]
 dependencies = [
     "jinja2",
+    "pyspf",
+    "dkimpy",
 ]
 
 [project.scripts]
+dkimsign = "opensmtpd_filters.dkimsign:start"
+dkimverify = "opensmtpd_filters.dkimverify:start"
 dmarc2html = "opensmtpd_filters.dmarc2html_filter:start"
 dmarc2html-cli = "opensmtpd_filters.dmarc2html_cli:run"
 

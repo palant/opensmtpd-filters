@@ -12,6 +12,28 @@ pipx install git+https://github.com/palant/opensmtpd-filters.git
 
 Once installed, you can run the `dmarc2html-cli` command for example.
 
+## dkimverify
+
+This filter will perform DKIM and SPF verification on incoming mail. It can be used in `smtpd.conf` like this:
+
+```
+filter dkimverify proc-exec "/home/user/.local/share/pipx/venvs/opensmptd_filters/bin/dkimverify.py example.com"
+listen on eth0 tls filter dkimverify
+```
+
+It takes a single command line parameter: the host name to appear in the `Authentication-Results` email header. It will add a header like `Authentication-Results: example.com; dkim=pass; spf=fail (sender is example.com/1.2.3.4) smtp.mailfrom=me@example.org` to emails, this header can then be considered in further processing.
+
+## dkimsign
+
+This filter will add a DKIM signature to outgoing emails. It can be used in `smtpd.conf` like this:
+
+```
+filter dkimsign proc-exec "/usr/local/bin/dkimsign.py example.com:mydkim:/etc/mail/dkim/mydkim.key"
+listen on eth0 port 587 tls-require auth filter dkimsign
+```
+
+It takes one or multiple parameters of the form `domain:selector:keyfile` on the command line. Instead of configuring all domains on the command line, you can also pass this script `-c /etc/mail/dkim/dkim.conf` parameter, with the file `/etc/mail/dkim/dkim.conf` containing domain configurations in the same format, one per line.
+
 ## dmarc2html
 
 This filter helps to simplify handling of DMARC aggregate reports for low-volume email servers. It can be used in `smtpd.conf` like this:
