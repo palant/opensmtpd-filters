@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-import argparse
 import datetime
 import enum
 import gzip
@@ -73,7 +70,7 @@ def process_xml(node, fields):
                         data += ' ({})'.format(socket.gethostbyaddr(data)[0])
                     except:
                         pass
-                        
+
                 elif Flags.TIME in flags:
                     data = datetime.datetime.fromtimestamp(int(data), tz=datetime.timezone.utc).isoformat(sep=' ').replace('+00:00', ' UTC')
 
@@ -140,7 +137,10 @@ def parse_data(xml):
 
 
 def produce_html(data):
-    env = jinja2.Environment(loader=jinja2.PackageLoader('dmarc2html'), autoescape=True)
+    env = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), 'templates')),
+        autoescape=True
+    )
     template = env.get_template('output.html')
     return template.render(data)
 
@@ -150,10 +150,3 @@ def process_report(path):
     data = parse_data(xml)
     data['xml'] = xml.toxml()
     return produce_html(data)
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(prog='dmarc2html', description='DMARC aggregate report to HTML converter')
-    parser.add_argument('report_file', help='Path of the DMARC aggregate report file')
-    args = parser.parse_args()
-    print(process_report(args.report_file))

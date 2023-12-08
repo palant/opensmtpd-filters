@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import argparse
 import email
 import email.message
@@ -7,8 +6,8 @@ import io
 import re
 import traceback
 
-from dmarc2html import process_report
-from opensmtpd import FilterServer
+from .dmarc2html import process_report
+from .opensmtpd import FilterServer
 
 def start():
     parser = argparse.ArgumentParser(description='DMARC converter filter for OpenSMTPD.')
@@ -60,6 +59,3 @@ def convert(account_name, session, lines):
     except:
         traceback.print_exc()
         return lines
-
-if __name__ == '__main__':
-    start()

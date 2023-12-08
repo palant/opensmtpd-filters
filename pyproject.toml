@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "opensmtpd-filters"
+version = "1.0.0"
+authors = [
+    { name="Wladimir Palant" },
+]
+description = "A collection of OpenSMTPD filters"
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.6"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "jinja2",
+]
+
+[project.scripts]
+dmarc2html = "opensmtpd_filters.dmarc2html_filter:start"
+dmarc2html-cli = "opensmtpd_filters.dmarc2html_cli:run"
+
+[tool.setuptools.package-data]
+opensmtpd_filters = ["templates/*"]

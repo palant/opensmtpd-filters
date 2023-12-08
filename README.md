@@ -1,13 +1,28 @@
-This is a set of scripts to simplify handling DMARC aggregate reports for low-volume email servers. Some explanations can be found in [this blog article](https://palant.info/2023/03/08/converting-incoming-emails-on-the-fly-with-opensmtpd-filters/). No support is provided, use at your own risk.
+# Collection of various OpenSMTPD filters
 
-Requirements: [Jinja2](https://jinja.palletsprojects.com/intro/#installation)
+This collection of OpenSMTPD filters is described in my blog posts [Adding DKIM support to OpenSMTPD with custom filters](https://palant.info/2020/11/09/adding-dkim-support-to-opensmtpd-with-custom-filters/) and [Converting incoming emails on the fly with OpenSMTPD filters](https://palant.info/2023/03/08/converting-incoming-emails-on-the-fly-with-opensmtpd-filters/). No support is provided, use at your own risk.
 
-`dmarc2html.py` is a command line conversion script. It takes the path to the aggregate report file as parameter and outputs HTML code.
+## Installing
 
-`filter.py` is an OpenSMTPd filter process, to be used in `smtpd.conf` like this:
+These scripts are most easily installed via [pipx](https://pipx.pypa.io/):
+
+```sh
+pipx install git+https://github.com/palant/opensmtpd-filters.git
+```
+
+Once installed, you can run the `dmarc2html-cli` command for example.
+
+## dmarc2html
+
+This filter helps to simplify handling of DMARC aggregate reports for low-volume email servers. It can be used in `smtpd.conf` like this:
 
 ```
-filter dmarc2html proc-exec "/opt/dmarc2html/filter.py dmarc"
+filter dmarc2html proc-exec "/home/user/.local/share/pipx/venvs/opensmptd_filters/bin/dmarc2html.py dmarc"
 ```
-
 For any email to the `dmarc@…` account (or any other account specified as command line parameter), it will process the attachment and replace the email’s main part by the resulting HTML code.
+
+There is also a script that will convert a DMARC aggregate report on the command line:
+
+```
+dmarc2html-cli dmarc.tar.gz
+```
