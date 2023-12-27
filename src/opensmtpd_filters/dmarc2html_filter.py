@@ -38,14 +38,12 @@ def convert(account_name, session, lines):
         if not parsed.is_multipart():
             raise Exception('Multipart message expected')
 
-        attachments = [*parsed.iter_attachments()]
+        attachments = [part for part in parsed.walk() if part.get_filename()]
         if len(attachments) != 1:
-            raise Exception('Expected one attachment, got {}'.format(len(attachments)))
+            raise Exception('Expected one named attachment, got {}'.format(len(attachments)))
 
         attachment = attachments[0]
-        filename = attachment.get_filename(attachment)
-        if filename is None:
-            raise Exception('Attachment does not have a file name')
+        filename = attachment.get_filename()
 
         bytes = io.BytesIO(attachment.get_payload(decode=True))
         bytes.name = filename
