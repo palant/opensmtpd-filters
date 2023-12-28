@@ -33,10 +33,7 @@ def convert(account_name, session, lines):
             return lines
 
         parsed = email.message_from_string('\n'.join(lines), policy=email.policy.default)
-        if not parsed.is_multipart() and parsed.get_filename() is not None:
-            parsed.make_mixed()
-        if not parsed.is_multipart():
-            raise Exception('Multipart message expected')
+        parsed.make_mixed()
 
         attachments = [part for part in parsed.walk() if part.get_filename()]
         if len(attachments) != 1:
