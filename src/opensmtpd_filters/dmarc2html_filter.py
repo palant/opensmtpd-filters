@@ -33,7 +33,8 @@ def convert(account_name, session, lines):
             return lines
 
         parsed = email.message_from_string('\n'.join(lines), policy=email.policy.default)
-        parsed.make_mixed()
+        if parsed.get_content_maintype() != 'multipart' or parsed.get_content_subtype() != 'mixed':
+            parsed.make_mixed()
 
         attachments = [part for part in parsed.walk() if part.get_filename()]
         if len(attachments) != 1:
