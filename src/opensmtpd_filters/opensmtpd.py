@@ -1,3 +1,4 @@
+import inspect
 import os
 import re
 import sys
@@ -64,7 +65,22 @@ class FilterServer:
             try:
                 if self._contexts is not None and key != 'report|link-connect':
                     session = self._contexts[session]
-                result_handler(self._handlers[key](session, *args))
+
+                handler = self._handlers[key]
+                expected_args = inspect.signature(handler).parameters.values()
+                if any(param.kind == inspect.Parameter.VAR_POSITIONAL for param in expected_args):
+                    # Handler has catch-all parameter, can accept any number of positional parameters
+                    num_expected = len(args)
+                else:
+                    positional_kind = (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD)
+                    num_expected = len(list(filter(lambda param: param.kind in positional_kind, expected_args))) - 1
+
+                if num_expected >= len(args):
+                    result_handler(handler(session, *args))
+                else:
+                    # Handler expects fewer positional parameters than we have. This could happen
+                    # e.g. if an email address contains the pipe symbol.
+                    result_handler(handler(session, *args[:num_expected - 1], '|'.join(args[num_expected - 1:])))
             except:
                 self.log_exception()
 
