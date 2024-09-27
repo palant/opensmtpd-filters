@@ -21,7 +21,11 @@ class FilterServer:
     def recv(self):
         """Low-level functionality. Receives one line from OpenSMTPD."""
 
-        return self._stdin.readline().rstrip('\r\n')
+        line = self._stdin.readline()
+        if line == '':
+            raise Exception('No more input')
+        else:
+            return line.rstrip('\r\n')
 
 
     def send(self, line):
