@@ -51,5 +51,7 @@ def sign(config, lines):
         ).decode('latin-1')
         header, value = re.split(r':\s*', signature, 1)
         parsed[header] = value
-        lines = parsed.as_string().splitlines(False)
+        lines = re.split(r'\r?\n', parsed.as_string())
+        if lines[-1] == '':
+            lines.pop()
     return lines

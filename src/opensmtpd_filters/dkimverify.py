@@ -68,4 +68,7 @@ def verify(server, hostname, context, lines):
         spf_result = ''
 
     parsed['Authentication-Results'] = '{}; dkim={}{}'.format(hostname, dkim_result, spf_result)
-    return parsed.as_string().splitlines(False)
+    lines = re.split(r'\r?\n', parsed.as_string())
+    if lines[-1] == '':
+        lines.pop()
+    return lines
